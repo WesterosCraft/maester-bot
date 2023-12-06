@@ -13,3 +13,5 @@ export const execute = async (interaction: CommandInteraction) => {
   const item = QUOTES[Math.floor(Math.random() * QUOTES.length)];
   await interaction.reply(`${emoji} ${item}`);
 };
+
+export const cooldown = 5;

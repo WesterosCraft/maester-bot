@@ -1,5 +1,7 @@
 import { SlashCommandBuilder, CommandInteraction } from "discord.js";
 
+export const category = "utility";
+
 export const data = new SlashCommandBuilder()
   .setName("user")
   .setDescription("Provides information about the user.");
