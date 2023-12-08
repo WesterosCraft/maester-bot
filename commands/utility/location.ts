@@ -6,6 +6,9 @@ import {
 } from "discord.js";
 import matter from "gray-matter";
 import slugify from "slugify";
+import { request } from "undici";
+import locations from "../../locations.json";
+import { PROJECT_STATUS, PROJECT_TYPES, REGIONS } from "../../utils/constants";
 
 export const category = "utility";
 
@@ -26,23 +29,25 @@ export const data = new SlashCommandBuilder()
 
 export const autocomplete = async (interaction: AutocompleteInteraction) => {
   const focusedValue = interaction.options.getFocused();
-  const choices = ["Kings Landing", "Winterfell", "Sunspear"];
-  const filtered = choices.filter(
-    (choice) =>
-      choice.startsWith(focusedValue) ||
-      choice.toLowerCase().startsWith(focusedValue)
-  );
 
-  await interaction.respond(
-    filtered.map((choice) => ({ name: choice, value: choice }))
-  );
+  if (focusedValue.length > 3) {
+    const filtered = locations.filter(
+      (choice) =>
+        choice.title.startsWith(focusedValue) ||
+        choice.title.toLowerCase().startsWith(focusedValue)
+    );
+
+    await interaction.respond(
+      filtered.map((choice) => ({ name: choice.title, value: choice.slug }))
+    );
+  }
 };
 
 interface ProjectDetails {
   title: string;
-  region: string;
-  projectStatus: string;
-  projectType: string;
+  region: keyof typeof REGIONS;
+  projectStatus: keyof typeof PROJECT_STATUS;
+  projectType: keyof typeof PROJECT_TYPES;
   warp: string;
   house: string;
   application: string;
@@ -66,7 +71,7 @@ export const execute = async (interaction: ChatInputCommandInteraction) => {
   const autocompleteResult = interaction.options.get("query");
   const query = autocompleteResult?.value?.toString()?.toLowerCase();
 
-  if (!autocompleteResult || !query) {
+  if (!autocompleteResult || !query || query === "invalid") {
     await interaction.reply({
       content: `There was an error searching for that location. Please try again.`,
       ephemeral: true,
@@ -74,11 +79,17 @@ export const execute = async (interaction: ChatInputCommandInteraction) => {
   }
   try {
     if (autocompleteResult && query) {
-      const url = `https://raw.githubusercontent.com/WesterosCraft/website/main/src/content/locations/${slugify(
-        query
-      )}/index.mdoc`;
-      const response = await fetch(url);
-      const fileContent = await response.text();
+      const result = await request(
+        `https://raw.githubusercontent.com/WesterosCraft/website/main/src/content/locations/${slugify(
+          query
+        )}/index.mdoc`
+      );
+
+      if (result.statusCode === 404) {
+        throw new Error(`${query}`);
+      }
+
+      const fileContent = await result.body.text();
       const parsedFrontMatter = matter(fileContent);
       const project: Partial<ProjectDetails> = parsedFrontMatter?.data;
 
@@ -88,8 +99,14 @@ export const execute = async (interaction: ChatInputCommandInteraction) => {
         url:
           project?.region && project?.title
             ? `https://westeroscraft.com/locations/${slugify(
-                project?.region?.toLowerCase()
-              )}/${slugify(project?.title?.toLowerCase())}`
+                project?.region
+                  ?.replace(/([A-Z]+)*([A-Z][a-z])/g, "$1 $2")
+                  ?.toLowerCase()
+              )}/${slugify(
+                project?.title
+                  ?.replace(/([A-Z]+)*([A-Z][a-z])/g, "$1 $2")
+                  ?.toLowerCase()
+              )}`
             : undefined,
         author: {
           name: "WesterosCraft",
@@ -98,45 +115,55 @@ export const execute = async (interaction: ChatInputCommandInteraction) => {
           url: "https://westeroscraft.com/",
         },
         description: project?.description,
-        // thumbnail: {
-        //   url:
-        //     `${project?.locationImages?.[0]?.src}?width=256&height=256&fit=crop` ||
-        //     "https://bxf03rev1vvg.keystatic.net/cm4n7v612uoj/images/rww9dfay30d1/og-min?width=256&height=256&fit=cover",
-        // },
+        thumbnail: project?.bannerImage?.src
+          ? {
+              url: `${project?.bannerImage?.src}?height=80&fit=cover`,
+            }
+          : undefined,
         fields: [
           {
             name: "Region",
-            value: project?.region || "",
+            value: project?.region ? REGIONS[project?.region] : "",
+            inline: true,
           },
           {
             name: "Project Status",
-            value: project?.projectStatus || "Not started",
+            value: project?.projectStatus
+              ? PROJECT_STATUS[project?.projectStatus]
+              : "Not started",
+            inline: true,
           },
           {
             name: "Project Type",
-            value: project?.projectType || "Miscellaneous",
+            value: project?.projectType
+              ? PROJECT_TYPES[project?.projectType]
+              : "Miscellaneous",
+            inline: true,
           },
           {
             name: "House",
-            value: project?.house || "Miscellaneous",
+            value: project?.house ?? "",
+            inline: true,
           },
           {
             name: "Warp",
-            value: project?.warp || "",
+            value: project?.warp ?? "",
+            inline: true,
           },
-          // {
-          //   name: "\u200b",
-          //   value: "\u200b",
-          //   inline: false,
-          // },
           {
             name: "Date Started",
-            value: project?.dateStarted || "",
+            value:
+              project?.dateStarted && project?.dateStarted !== "undefined"
+                ? project?.dateStarted
+                : "",
             inline: true,
           },
           {
             name: "Date Completed",
-            value: project?.dateCompleted || "",
+            value:
+              project?.dateCompleted && project?.dateCompleted !== "undefined"
+                ? project?.dateCompleted
+                : "",
             inline: true,
           },
           {
@@ -150,23 +177,32 @@ export const execute = async (interaction: ChatInputCommandInteraction) => {
             inline: true,
           },
         ],
-        image: {
-          url: project?.locationImages?.[0]?.src
-            ? `${project?.locationImages?.[0]?.src}?width=256&height=256&fit=crop`
-            : "https://bxf03rev1vvg.keystatic.net/cm4n7v612uoj/images/rww9dfay30d1/og-min?width=256&height=256&fit=cover",
-        },
+        image: project?.locationImages?.[0]?.src
+          ? {
+              url: project?.locationImages?.[0]?.src
+                ? `${project?.locationImages?.[0]?.src}?width=256&height=256&fit=crop`
+                : "https://bxf03rev1vvg.keystatic.net/cm4n7v612uoj/images/rww9dfay30d1/og-min?width=256&height=256&fit=cover",
+            }
+          : undefined,
         timestamp: new Date().toISOString(),
-        footer: {
-          text: "Some footer text here",
-          icon_url: "https://i.imgur.com/AfFp7pu.png",
-        },
+        footer: project?.projectLeads
+          ? {
+              text: `Project leads: ${project?.projectLeads}` || "",
+              // icon_url: "https://i.imgur.com/AfFp7pu.png",
+            }
+          : undefined,
       } satisfies APIEmbed;
 
-      await interaction.reply({ embeds: [embed], ephemeral: true });
+      await interaction.reply({
+        embeds: [embed],
+        // ephemeral: true,
+      });
     }
   } catch (error: any) {
     await interaction.reply({
-      content: `There was an error searching for that location:\n\`${error?.message}\``,
+      content: `There was an error searching for that location${
+        error?.message ? `: ${error?.message}` : ``
+      }`,
       ephemeral: true,
     });
   }

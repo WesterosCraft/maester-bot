@@ -84,22 +84,3 @@ export const execute = async (
     return;
   }
 };
-
-// export const autocomplete = async (interaction: AutocompleteInteraction) => {
-//   if (!interaction.isAutocomplete()) return;
-
-//   const command = interaction.client.commands.get(interaction.commandName);
-
-//   if (!command) {
-//     console.error(`No command matching ${interaction.commandName} was found.`);
-//     return;
-//   }
-
-//   console.log("IS AUTOCOMPLETE");
-//   try {
-//     await command.autocomplete(interaction);
-//     return;
-//   } catch (error) {
-//     console.error(error);
-//   }
-// };

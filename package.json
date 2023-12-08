@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "ts-node . --files discord.d.ts",
-    "deploy": "ts-node deploy-commands.ts"
+    "deploy": "ts-node deploy-commands.ts",
+    "fetch:locations": "ts-node fetch-locations.ts"
   },
   "keywords": [],
   "author": "",
@@ -15,7 +16,8 @@
     "discord.js": "^14.14.1",
     "dotenv": "^16.3.1",
     "gray-matter": "^4.0.3",
-    "slugify": "^1.6.6"
+    "slugify": "^1.6.6",
+    "undici": "^6.0.1"
   },
   "devDependencies": {
     "eslint": "^8.54.0",

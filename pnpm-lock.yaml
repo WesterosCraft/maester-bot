@@ -17,6 +17,9 @@ dependencies:
   slugify:
     specifier: ^1.6.6
     version: 1.6.6
+  undici:
+    specifier: ^6.0.1
+    version: 6.0.1
 
 devDependencies:
   eslint:
@@ -894,6 +897,13 @@ packages:
   /undici@5.27.2:
     resolution: {integrity: sha512-iS857PdOEy/y3wlM3yRp+6SNQQ6xU0mmZcwRSriqk+et/cwWAtwmIGf6WkoDN2EK/AMdCO/dfXzIwi+rFMrjjQ==}
     engines: {node: '>=14.0'}
+    dependencies:
+      '@fastify/busboy': 2.1.0
+    dev: false
+
+  /undici@6.0.1:
+    resolution: {integrity: sha512-eZFYQLeS9BiXpsU0cuFhCwfeda2MnC48EVmmOz/eCjsTgmyTdaHdVsPSC/kwC2GtW2e0uH0HIPbadf3/bRWSxw==}
+    engines: {node: '>=18.0'}
     dependencies:
       '@fastify/busboy': 2.1.0
     dev: false
