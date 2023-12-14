@@ -5,6 +5,7 @@ dotenv.config();
 const { DISCORD_TOKEN, DISCORD_CLIENT_ID, DISCORD_GUILD_ID } = process.env;
 
 if (!DISCORD_TOKEN || !DISCORD_CLIENT_ID || !DISCORD_GUILD_ID) {
+  console.error("Missing environment variables")
   throw new Error("Missing environment variables");
 }
 
