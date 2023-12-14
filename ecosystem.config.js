@@ -1,7 +1,6 @@
 module.exports = {
   apps : [ {
-    name: "NodeServer",
+    name: "MaesterBot",
     script: "./dist/index.js"
-  
 }]
 }
