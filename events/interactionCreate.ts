@@ -3,12 +3,16 @@ import {
   Collection,
   CommandInteraction,
   AutocompleteInteraction,
+  StringSelectMenuInteraction,
 } from "discord.js";
 
 export const name = Events.InteractionCreate;
 
 export const execute = async (
-  interaction: CommandInteraction | AutocompleteInteraction
+  interaction:
+    | CommandInteraction
+    | AutocompleteInteraction
+    | StringSelectMenuInteraction
 ) => {
   if (interaction.isChatInputCommand()) {
     // @ts-ignore
@@ -65,7 +69,8 @@ export const execute = async (
         });
       }
     }
-  } else if (interaction.isAutocomplete()) {
+  }
+  if (interaction.isAutocomplete()) {
     const command = interaction.client.commands.get(interaction.commandName);
 
     if (!command) {
@@ -80,7 +85,11 @@ export const execute = async (
     } catch (error) {
       console.error(error);
     }
-  } else {
-    return;
   }
+
+  if (interaction.isStringSelectMenu()) {
+    await interaction.fetchReply();
+  }
+
+  return;
 };

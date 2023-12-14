@@ -34,3 +34,18 @@ export const PROJECT_TYPES = {
   crannog: "Crannog",
   miscellaneous: "Miscellaneous",
 } as const;
+
+export const LOCATION_PROPERTIES = {
+  title: "Title",
+  region: "Region",
+  projectStatus: "Project Status",
+  projectType: "Type",
+  warp: "Warp",
+  house: "House",
+  application: "Application",
+  projectLeads: "Project Lead(s)",
+  dateStarted: "Date Started",
+  dateCompleted: "Date Completed",
+  redoAvailable: "Redo Available",
+  serverProject: "Server Project",
+} as const;

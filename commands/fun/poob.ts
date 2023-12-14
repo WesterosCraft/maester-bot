@@ -1,5 +1,7 @@
 import { CommandInteraction, SlashCommandBuilder } from "discord.js";
 
+export const category = "fun";
+
 export const data = new SlashCommandBuilder()
   .setName("poob")
   .setDescription("Replies with Poob!");
