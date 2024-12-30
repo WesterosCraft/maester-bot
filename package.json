@@ -9,7 +9,7 @@
     "start": "pm2 start --watch index.ts",
     "build": "tsc",
     "deploy": "ts-node deploy-commands.ts",
-    "pm2": "tsc && pm2 start ecosystem.config.js",
+    "pm2": "tsc && pm2 start run-ts.sh",
     "kill:pm2": "pm2 kill",
     "fetch:locations": "ts-node fetch-locations.ts"
   },
@@ -17,11 +17,11 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "discord.js": "^14.14.1",
-    "dotenv": "^16.3.1",
+    "discord.js": "^14.16.3",
+    "dotenv": "^16.4.7",
     "gray-matter": "^4.0.3",
     "slugify": "^1.6.6",
-    "undici": "^6.0.1"
+    "undici": "^7.2.0"
   },
   "devDependencies": {
     "eslint": "^8.54.0",

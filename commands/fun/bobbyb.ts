@@ -8,16 +8,21 @@ export const data = new SlashCommandBuilder()
   .setDescription("Replies with King Robert Baratheon quotes");
 
 export const execute = async (interaction: CommandInteraction) => {
-  const emoji = interaction.client.emojis.cache.find(
-    (emoji) => emoji.name === "bobbyb"
-  );
+  try { 
+    const emoji = interaction.client.emojis.cache.find(
+      (emoji) => emoji.name === "bobbyb"
+    );
+  
+    const item = QUOTES[Math.floor(Math.random() * QUOTES.length)];
+    const message = await interaction.reply({
+      content: `${emoji} ${item}`,
+      fetchReply: true,
+    });
+    message.react("<:bobbyb:1180292508153020506>");
 
-  const item = QUOTES[Math.floor(Math.random() * QUOTES.length)];
-  const message = await interaction.reply({
-    content: `${emoji} ${item}`,
-    fetchReply: true,
-  });
-  message.react("<:bobbyb:1180292508153020506>");
+  } catch (e) {
+      console.error(e)
+  }
 };
 
 export const cooldown = 5;
